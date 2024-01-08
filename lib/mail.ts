@@ -6,10 +6,10 @@ export const sendverificationEmail = async (
   email: string,
   token: string
 ) => {
-  const confirmeLink = `http://localhosto:3000/auth/new-verification?token=${token}`;
+  const confirmeLink = `http://localhost:3000/auth/new-verification?token=${token}`;
 
   await resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "auth@amigododinheiro.com",
     to: email,
     subject: "Confirme seu email",
     html: `<p>Clique  <a href="${confirmeLink}">Aqui</a> para confirmar seu email</p>`
