@@ -48,8 +48,17 @@ model Account {
 model VerificarionToken {
   id                  String  @id @default(cuid())
   email               String
-  token String @unique
-  expires DateTime
+  token               String @unique
+  expires             DateTime
+
+  @@unique([email,token])
+}
+
+model PasswordResetToken {
+  id                  String  @id @default(cuid())
+  email               String
+  token               String @unique
+  expires             DateTime
 
   @@unique([email,token])
 }
