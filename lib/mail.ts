@@ -29,3 +29,13 @@ export const sendPasswordResetEmail = async (
     html: `<p>Clique  <a href="${resetLink}">Aqui</a> para criar uma nova senha</p>`
   });
 }
+
+export const sendTwoFactorTokenEmail =async (email:string, token: string) => {
+  
+  await resend.emails.send({
+    from: "auth@amigododinheiro.com",
+    to: email,
+    subject: "Seu codigo de segurança chegou!",
+    html: `<p>Seu codigo de segurança é: <strong>${token}</strong></p>`
+  });
+}
