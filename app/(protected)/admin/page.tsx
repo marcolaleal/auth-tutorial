@@ -1,8 +1,11 @@
 "use client";
 
+import { toast } from "sonner";
+
+import { admin } from "@/actions/admin";
+import { Button } from "@/components/ui/button";
 import { RoleGate } from "@/components/auth/role-gate";
 import { FormSuccess } from "@/components/form-success";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 const AdminPage =  () => {
@@ -10,9 +13,21 @@ const AdminPage =  () => {
     fetch("/api/admin")
       .then((response) => {
         if(response.ok){
-          console.log("OK");
+          toast.success("Sucesso em acessar a API como ADMIN")
         } else {
-          console.error("FORBIDDEN");
+          toast.error("Proibido acesso a API.")
+        }
+      })
+  }
+
+  const onServerActionClick = () => {
+    admin()
+      .then((data) => {
+        if(data.error){
+          toast.error(data.error);
+        }
+        if(data.success){
+          toast.success(data.success);
         }
       })
   }
@@ -43,7 +58,7 @@ const AdminPage =  () => {
           <p className="text-sm font-medium">
             Admin-only Server Action:
           </p>
-          <Button>
+          <Button onClick={onServerActionClick}>
             Testar
           </Button>
         </div>
