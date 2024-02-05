@@ -24,7 +24,7 @@ model User {
   password                  String?   @db.Text
   role                      UserRole  @default(USER)
   accounts                  Account[]
-  IsTwoFactorEnabled        Boolean @default(false)
+  isTwoFactorEnabled        Boolean @default(false)
   TwoFactorConfirmation     TwoFactorConfirmation? 
 }
 

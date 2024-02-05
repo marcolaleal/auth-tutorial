@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession } from "next-auth"
+import NextAuth, { DefaultSession, Session } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 
 import { db } from "./lib/db"
@@ -6,6 +6,7 @@ import authConfig from "@/auth.config"
 import { getUserById } from "./data/user"
 import { UserRole } from "@prisma/client"
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { getAccountByUserId } from "./data/account"
 
 declare module "@auth/core/types" {
   interface Session {
@@ -45,13 +46,17 @@ export const {
         return true
       }
 
+      if(!user.id) {
+        return false;
+      }
+
       const existingUser = await getUserById(user.id)
 
       if(!existingUser?.emailVerified){
         return false;
       }
       
-      if(existingUser.IsTwoFactorEnabled) {
+      if(existingUser.isTwoFactorEnabled) {
         const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
 
         if(!twoFactorConfirmation) {
@@ -68,7 +73,7 @@ export const {
 
       return true
     },
-    async session({ token, session }) {
+    async session({ token, session }: {token?: any; session: Session}) {
       if( token.sub && session.user) {
         session.user.id = token.sub;
       }
@@ -79,6 +84,13 @@ export const {
       if(session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean
       }
+
+      if(session.user){
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.isOAuth = token.isOAuth;
+      }
+
       return session;
     },
     async jwt({ token }) {
@@ -92,8 +104,13 @@ export const {
         return token;
       };
 
+      const existingAccount = await getAccountByUserId(existingUser.id);
+
+      token.isOAuth = !!existingAccount;
+      token.name = existingUser.name;
+      token.email = existingUser.email
       token.role = existingUser.role;
-      token.isTwoFactorEnabled = existingUser.IsTwoFactorEnabled;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     }
